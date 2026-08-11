@@ -1,6 +1,15 @@
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 
+let player = {
+  x: 200,
+  y: 200,
+  size: 40,
+  speed: 4
+};
+
+const keys = {};
+
 function resizeCanvas() {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
@@ -9,27 +18,72 @@ function resizeCanvas() {
 resizeCanvas();
 window.addEventListener("resize", resizeCanvas);
 
-function gameLoop() {
+window.addEventListener("keydown", (e) => {
+  keys[e.key] = true;
+});
+
+window.addEventListener("keyup", (e) => {
+  keys[e.key] = false;
+});
+
+function update() {
+  if (keys["ArrowUp"] || keys["w"]) {
+    player.y -= player.speed;
+  }
+
+  if (keys["ArrowDown"] || keys["s"]) {
+    player.y += player.speed;
+  }
+
+  if (keys["ArrowLeft"] || keys["a"]) {
+    player.x -= player.speed;
+  }
+
+  if (keys["ArrowRight"] || keys["d"]) {
+    player.x += player.speed;
+  }
+
+  player.x = Math.max(0, Math.min(canvas.width - player.size, player.x));
+  player.y = Math.max(0, Math.min(canvas.height - player.size, player.y));
+}
+
+function draw() {
+  // Background
   ctx.fillStyle = "#18251c";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  ctx.fillStyle = "#f5d98b";
-  ctx.font = "bold 28px Arial";
+  // Ground
+  ctx.fillStyle = "#4d7c45";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Player
+  ctx.fillStyle = "#8b4513";
+  ctx.fillRect(player.x, player.y, player.size, player.size);
+
+  // Player head
+  ctx.fillStyle = "#f0c39b";
+  ctx.fillRect(
+    player.x + 10,
+    player.y - 12,
+    20,
+    20
+  );
+
+  // Title
+  ctx.fillStyle = "#ffffff";
+  ctx.font = "bold 18px Arial";
   ctx.textAlign = "center";
 
   ctx.fillText(
     "CHRONICLES OF ELDORIA",
     canvas.width / 2,
-    canvas.height / 2 - 20
+    30
   );
+}
 
-  ctx.font = "16px Arial";
-  ctx.fillText(
-    "Game sedang dimulai...",
-    canvas.width / 2,
-    canvas.height / 2 + 20
-  );
-
+function gameLoop() {
+  update();
+  draw();
   requestAnimationFrame(gameLoop);
 }
 
