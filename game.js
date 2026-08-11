@@ -88,3 +88,56 @@ function gameLoop() {
 }
 
 gameLoop();
+const joystick = document.getElementById("joystick");
+const stick = document.getElementById("stick");
+
+let joystickActive = false;
+
+joystick.addEventListener("touchstart", (e) => {
+  e.preventDefault();
+  joystickActive = true;
+});
+
+joystick.addEventListener("touchmove", (e) => {
+  e.preventDefault();
+
+  if (!joystickActive) return;
+
+  const touch = e.touches[0];
+  const rect = joystick.getBoundingClientRect();
+
+  const centerX = rect.left + rect.width / 2;
+  const centerY = rect.top + rect.height / 2;
+
+  let dx = touch.clientX - centerX;
+  let dy = touch.clientY - centerY;
+
+  const maxDistance = 35;
+  const distance = Math.sqrt(dx * dx + dy * dy);
+
+  if (distance > maxDistance) {
+    dx = (dx / distance) * maxDistance;
+    dy = (dy / distance) * maxDistance;
+  }
+
+  stick.style.transform =
+    `translate(${dx}px, ${dy}px)`;
+
+  player.x += (dx / maxDistance) * player.speed;
+  player.y += (dy / maxDistance) * player.speed;
+
+  player.x = Math.max(
+    0,
+    Math.min(canvas.width - player.size, player.x)
+  );
+
+  player.y = Math.max(
+    0,
+    Math.min(canvas.height - player.size, player.y)
+  );
+});
+
+joystick.addEventListener("touchend", () => {
+  joystickActive = false;
+  stick.style.transform = "translate(0, 0)";
+});
