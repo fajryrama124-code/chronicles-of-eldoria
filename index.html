@@ -1,26 +1,56 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1.0,
-                 maximum-scale=1.0, user-scalable=no">
-
-  <title>Chronicles of Eldoria</title>
-
-<link rel="stylesheet" href="style.css?v=99">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>Chronicles of Eldoria</title>
+<link rel="stylesheet" href="style.css?v=full1">
 </head>
-
 <body>
+<canvas id="game"></canvas>
 
-  <canvas id="game"></canvas>
-  
-<div id="joystick">
-  <div id="stick"></div>
+<div id="hud">
+  <div id="brand">CHRONICLES OF ELDORIA</div>
+  <div id="status">
+    <div class="portrait">âš”ï¸</div>
+    <div class="bars">
+      <div class="bar hp"><span id="hpFill"></span></div>
+      <div class="bar xp"><span id="xpFill"></span></div>
+      <div class="level">LV <b id="level">1</b> Â· <span id="gold">0</span> G</div>
+    </div>
+  </div>
+  <div id="quest">ðŸ“œ <b>Quest:</b> Explore Eldoria Village</div>
+  <div id="zone">ELDORIA VILLAGE</div>
 </div>
 
-<button id="attack">⚔️</button>
-  <script src="game.js?v=3"></script>
+<div id="joystick"><div id="stick"></div></div>
+<button id="attack" aria-label="Attack">âš”ï¸</button>
+<button id="interact" aria-label="Interact">ðŸ’¬</button>
+<div id="toast"></div>
 
+<div id="party">
+  <button class="member active">âš”ï¸<small>Warrior</small></button>
+  <button class="member">ðŸ¹<small>Archer</small></button>
+  <button class="member">ðŸ”®<small>Mage</small></button>
+  <button class="member">ðŸ›¡ï¸<small>Knight</small></button>
+  <button class="member">ðŸ—¡ï¸<small>Rogue</small></button>
+</div>
+
+<div id="menu">
+  <button id="menuBtn">â˜°</button>
+  <div id="menuPanel">
+    <h2>Eldoria</h2>
+    <p>Real-time fantasy RPG prototype</p>
+    <div class="stats">
+      <span>STR <b id="str">10</b></span>
+      <span>DEF <b id="def">8</b></span>
+      <span>AGI <b id="agi">7</b></span>
+      <span>INT <b id="int">5</b></span>
+    </div>
+    <button id="closeMenu">Tutup</button>
+  </div>
+</div>
+
+<script src="game.js?v=full1"></script>
 </body>
 </html>
