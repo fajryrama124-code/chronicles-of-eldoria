@@ -1,14 +1,18 @@
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 
+const joystick = document.getElementById("joystick");
+const stick = document.getElementById("stick");
+
 let player = {
   x: 200,
   y: 200,
   size: 40,
-  speed: 4
+  speed: 5
 };
 
-const keys = {};
+let moveX = 0;
+let moveY = 0;
 
 function resizeCanvas() {
   canvas.width = window.innerWidth;
@@ -18,90 +22,16 @@ function resizeCanvas() {
 resizeCanvas();
 window.addEventListener("resize", resizeCanvas);
 
-window.addEventListener("keydown", (e) => {
-  keys[e.key] = true;
-});
+// ======================
+// JOYSTICK
+// ======================
 
-window.addEventListener("keyup", (e) => {
-  keys[e.key] = false;
-});
-
-function update() {
-  if (keys["ArrowUp"] || keys["w"]) {
-    player.y -= player.speed;
-  }
-
-  if (keys["ArrowDown"] || keys["s"]) {
-    player.y += player.speed;
-  }
-
-  if (keys["ArrowLeft"] || keys["a"]) {
-    player.x -= player.speed;
-  }
-
-  if (keys["ArrowRight"] || keys["d"]) {
-    player.x += player.speed;
-  }
-
-  player.x = Math.max(0, Math.min(canvas.width - player.size, player.x));
-  player.y = Math.max(0, Math.min(canvas.height - player.size, player.y));
-}
-
-function draw() {
-  // Background
-  ctx.fillStyle = "#18251c";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-  // Ground
-  ctx.fillStyle = "#4d7c45";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-  // Player
-  ctx.fillStyle = "#8b4513";
-  ctx.fillRect(player.x, player.y, player.size, player.size);
-
-  // Player head
-  ctx.fillStyle = "#f0c39b";
-  ctx.fillRect(
-    player.x + 10,
-    player.y - 12,
-    20,
-    20
-  );
-
-  // Title
-  ctx.fillStyle = "#ffffff";
-  ctx.font = "bold 18px Arial";
-  ctx.textAlign = "center";
-
-  ctx.fillText(
-    "CHRONICLES OF ELDORIA",
-    canvas.width / 2,
-    30
-  );
-}
-
-function gameLoop() {
-  update();
-  draw();
-  requestAnimationFrame(gameLoop);
-}
-
-gameLoop();
-const joystick = document.getElementById("joystick");
-const stick = document.getElementById("stick");
-
-let joystickActive = false;
-
-joystick.addEventListener("touchstart", (e) => {
+joystick.addEventListener("touchstart", function(e) {
   e.preventDefault();
-  joystickActive = true;
-});
+}, { passive: false });
 
-joystick.addEventListener("touchmove", (e) => {
+joystick.addEventListener("touchmove", function(e) {
   e.preventDefault();
-
-  if (!joystickActive) return;
 
   const touch = e.touches[0];
   const rect = joystick.getBoundingClientRect();
@@ -113,7 +43,10 @@ joystick.addEventListener("touchmove", (e) => {
   let dy = touch.clientY - centerY;
 
   const maxDistance = 35;
-  const distance = Math.sqrt(dx * dx + dy * dy);
+
+  const distance = Math.sqrt(
+    dx * dx + dy * dy
+  );
 
   if (distance > maxDistance) {
     dx = (dx / distance) * maxDistance;
@@ -123,21 +56,103 @@ joystick.addEventListener("touchmove", (e) => {
   stick.style.transform =
     `translate(${dx}px, ${dy}px)`;
 
-  player.x += (dx / maxDistance) * player.speed;
-  player.y += (dy / maxDistance) * player.speed;
+  moveX = dx / maxDistance;
+  moveY = dy / maxDistance;
 
+}, { passive: false });
+
+joystick.addEventListener("touchend", function(e) {
+  e.preventDefault();
+
+  moveX = 0;
+  moveY = 0;
+
+  stick.style.transform =
+    "translate(0px, 0px)";
+}, { passive: false });
+
+// ======================
+// UPDATE
+// ======================
+
+function update() {
+
+  player.x += moveX * player.speed;
+  player.y += moveY * player.speed;
+
+  // Batas layar
   player.x = Math.max(
     0,
-    Math.min(canvas.width - player.size, player.x)
+    Math.min(
+      canvas.width - player.size,
+      player.x
+    )
   );
 
   player.y = Math.max(
     0,
-    Math.min(canvas.height - player.size, player.y)
+    Math.min(
+      canvas.height - player.size,
+      player.y
+    )
   );
-});
+}
 
-joystick.addEventListener("touchend", () => {
-  joystickActive = false;
-  stick.style.transform = "translate(0, 0)";
-});
+// ======================
+// DRAW
+// ======================
+
+function draw() {
+
+  // Tanah
+  ctx.fillStyle = "#4d7c45";
+  ctx.fillRect(
+    0,
+    0,
+    canvas.width,
+    canvas.height
+  );
+
+  // Player
+  ctx.fillStyle = "#8b4513";
+  ctx.fillRect(
+    player.x,
+    player.y,
+    player.size,
+    player.size
+  );
+
+  // Kepala
+  ctx.fillStyle = "#f0c39b";
+  ctx.fillRect(
+    player.x + 10,
+    player.y - 12,
+    20,
+    20
+  );
+
+  // Nama game
+  ctx.fillStyle = "#ffffff";
+  ctx.font = "bold 18px Arial";
+  ctx.textAlign = "center";
+
+  ctx.fillText(
+    "CHRONICLES OF ELDORIA",
+    canvas.width / 2,
+    30
+  );
+}
+
+// ======================
+// GAME LOOP
+// ======================
+
+function gameLoop() {
+
+  update();
+  draw();
+
+  requestAnimationFrame(gameLoop);
+}
+
+gameLoop();
